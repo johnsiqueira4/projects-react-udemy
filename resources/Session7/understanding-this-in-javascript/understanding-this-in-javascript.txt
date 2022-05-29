@@ -1,0 +1,170 @@
+------------------------------  Example 1
+
+class Car {
+  setDriveSound(sound) {
+    this.sound = sound;
+  }
+  
+  drive() {
+    return this.sound;
+  }
+}
+
+const car = new Car();
+car.setDriveSound('vroom');
+
+car.drive()
+
+const truck = {
+ 	sound: 'pupputput',
+  driveMyTruck: car.drive
+  
+}
+
+truck.driveMyTruck()
+
+
+------------------------------- Example 2
+
+class Car {
+  setDriveSound(sound) {
+    this.sound = sound;
+  }
+  
+  drive() {
+    return this.sound;
+  }
+}
+
+const car = new Car();
+car.setDriveSound('vroom');
+
+const drive = car.drive;
+
+drive()
+
+ Result ----> TypeError: Cannot read properties of undefined (reading 'sound')
+
+
+--------------------------------  One way To solve the problem of example 2, find the constructor and do a bind of function. This will override the kind of broken function
+solving the 'this' problem, 'this' will be corrected with the instance of the class. 
+
+
+class Car {
+  constructor() {
+    this.drive = this.drive.bind(this);  
+  }
+  
+  setDriveSound(sound) {
+    this.sound = sound;
+  }
+  
+  drive() {
+    return this.sound;
+  }
+}
+
+const car = new Car();
+car.setDriveSound('vroom');
+
+const drive = car.drive;
+
+drive()
+
+
+------------------------------  The second way we can solve it is to turn the function right here that we are assigning to onFormSubmit() into an arrow function instead.
+this you know, this right here. What you see right here is essentially shorthand syntax for something like that:
+
+  onFormSubmit(event) {
+    event.preventDefault();
+
+    console.log(this.state.term);
+  }
+
+
+  onFormSubmit: function(event) {
+    event.preventDefault();
+
+    console.log(this.state.term);
+  }
+
+It defines onFormSubmit property and then assigns it a function declared with the function keyword. 
+And each time they use the function keyword, that's always going to lead to a broken value of 'this'.
+
+As I'm sure you're aware, we've got those nice sweet arrow functions with the ES2015.
+
+One of the special features of Arrow functions is that they automatically bind the value of this for all the code inside the function, so we can replace this default
+implementation right here or this usual syntax we've been using so far with a arrow function instead.
+To do so, I'm going to use a very similar syntax to what we did up here with State, so let's say..
+
+  onFormSubmit = (event) => {
+    event.preventDefault();
+
+    console.log(this.state.term);
+  };
+
+it's very similar to the State property. The only difference is that this time around, rather than assigning a object, we are assigning an arrow function.
+
+class SearchBar extends React.Component {
+  state = { term: "" };
+
+  onFormSubmit = (event) => {
+    event.preventDefault();
+
+    console.log(this.state.term);
+  };
+
+So the arrow function is going to automatically make sure that the value of 'this' is always equal to our SearchBar, or our instance of the SearchBar.
+
+------------------------------  The Thirth way we can solve its passing the callback function directly on the props as a arrow function like so:
+Before
+
+  onFormSubmit(event) {
+    event.preventDefault();
+
+    console.log(this.state.term);
+  };
+
+  render() {
+    return (
+      <div className="ui segment">
+        <form onSubmit={this.onFormSubmit} className="ui form">
+          <div className="field">
+            <label>Image Search</label>
+            <input
+              type="text"
+              value={this.state.term}
+              onChange={(e) => this.setState({ term: e.target.value })}
+            />
+          </div>
+        </form>
+      </div>
+    );
+  }
+}
+
+After
+
+  onFormSubmit(event) {
+    event.preventDefault();
+
+    console.log(this.state.term);
+  };
+
+  render() {
+    return (
+      <div className="ui segment">
+        <form onSubmit={(event) => this.onFormSubmit(event)} className="ui form">
+          <div className="field">
+            <label>Image Search</label>
+            <input
+              type="text"
+              value={this.state.term}
+              onChange={(e) => this.setState({ term: e.target.value })}
+            />
+          </div>
+        </form>
+      </div>
+    );
+  }
+}
